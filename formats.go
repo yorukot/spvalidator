@@ -32,7 +32,7 @@ var (
 	htmlTagPattern   = regexp.MustCompile(`(?is)<[a-z][^>]*>.*</[a-z][^>]*>|<[a-z][^>]*/>`)
 	ssnPattern       = regexp.MustCompile(`^([0-9]{3})-?([0-9]{2})-?([0-9]{4})$`)
 	uuidPattern      = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
-	semverPattern    = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$`)
+	semverPattern    = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-((?:0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$`)
 	ulidPattern      = regexp.MustCompile(`^[0-7][0-9A-HJKMNP-TV-Z]{25}$`)
 	cvePattern       = regexp.MustCompile(`^CVE-[0-9]{4}-[0-9]{4,}$`)
 )
@@ -131,8 +131,8 @@ func Cron(value string) error {
 	if len(fields) != 5 && len(fields) != 6 {
 		return fail("cron", value, nil, "cron expression must have 5 or 6 fields")
 	}
-	for _, field := range fields {
-		if !validCronField(field) {
+	for i, field := range fields {
+		if !validCronField(field, i, len(fields)) {
 			return fail("cron", value, nil, "cron expression contains an invalid field")
 		}
 	}
@@ -556,9 +556,12 @@ func hexLength(tag string, value string, length int) error {
 	return fail(tag, value, length, "value must be a hex hash of the required length")
 }
 
-func validCronField(field string) bool {
+func validCronField(field string, index int, total int) bool {
 	if field == "" {
 		return false
+	}
+	if allDigits(field) {
+		return cronFieldInRange(field, index, total)
 	}
 	for _, r := range field {
 		if !unicode.IsDigit(r) && !strings.ContainsRune("*,/-?", r) {
@@ -566,6 +569,44 @@ func validCronField(field string) bool {
 		}
 	}
 	return true
+}
+
+func cronFieldInRange(field string, index int, total int) bool {
+	min, max := cronFieldBounds(index, total)
+	n, err := strconv.Atoi(field)
+	if err != nil {
+		return false
+	}
+	return n >= min && n <= max
+}
+
+func cronFieldBounds(index int, total int) (int, int) {
+	switch {
+	case total == 6 && index == 0:
+		return 0, 59
+	case total == 6 && index == 1:
+		return 0, 59
+	case total == 6 && index == 2:
+		return 0, 23
+	case total == 6 && index == 3:
+		return 1, 31
+	case total == 6 && index == 4:
+		return 1, 12
+	case total == 6 && index == 5:
+		return 0, 7
+	case total == 5 && index == 0:
+		return 0, 59
+	case total == 5 && index == 1:
+		return 0, 23
+	case total == 5 && index == 2:
+		return 1, 31
+	case total == 5 && index == 3:
+		return 1, 12
+	case total == 5 && index == 4:
+		return 0, 7
+	default:
+		return 0, 0
+	}
 }
 
 func digitsOnly(value string) string {
@@ -585,7 +626,11 @@ func digitsOnlyValue(value any) string {
 	case string:
 		return digitsOnly(v)
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr:
-		return strings.TrimLeft(strings.TrimPrefix(strings.TrimPrefix(strings.TrimSpace(toDecimalString(v)), "+"), "-"), " ")
+		s := strings.TrimSpace(toDecimalString(v))
+		if strings.HasPrefix(s, "-") {
+			return ""
+		}
+		return strings.TrimPrefix(s, "+")
 	default:
 		return ""
 	}

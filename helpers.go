@@ -2,6 +2,8 @@ package spvalidator
 
 import (
 	"fmt"
+	"math"
+	"math/big"
 	"reflect"
 	"strconv"
 	"strings"
@@ -84,6 +86,14 @@ func numberValue(value any) (float64, bool) {
 }
 
 func compareOrder(left any, right any) (int, bool) {
+	if ln, ok := exactNumber(left); ok {
+		rn, ok := exactNumber(right)
+		if !ok {
+			return 0, false
+		}
+		return ln.Cmp(rn), true
+	}
+
 	if lt, ok := left.(time.Time); ok {
 		rt, ok := right.(time.Time)
 		if !ok {
@@ -137,10 +147,9 @@ func compareOrder(left any, right any) (int, bool) {
 }
 
 func equalAny(left any, right any) bool {
-	if ln, ok := numberValue(left); ok {
-		if rn, ok := numberValue(right); ok {
-			return ln == rn
-		}
+	if ln, ok := exactNumber(left); ok {
+		rn, ok := exactNumber(right)
+		return ok && ln.Cmp(rn) == 0
 	}
 	return reflect.DeepEqual(left, right)
 }
@@ -171,4 +180,47 @@ func numericParam(value any) (float64, bool) {
 		return n, true
 	}
 	return 0, false
+}
+
+func exactNumber(value any) (*big.Rat, bool) {
+	switch v := value.(type) {
+	case int:
+		return new(big.Rat).SetInt(big.NewInt(int64(v))), true
+	case int8:
+		return new(big.Rat).SetInt(big.NewInt(int64(v))), true
+	case int16:
+		return new(big.Rat).SetInt(big.NewInt(int64(v))), true
+	case int32:
+		return new(big.Rat).SetInt(big.NewInt(int64(v))), true
+	case int64:
+		return new(big.Rat).SetInt(big.NewInt(v)), true
+	case uint:
+		return new(big.Rat).SetInt(new(big.Int).SetUint64(uint64(v))), true
+	case uint8:
+		return new(big.Rat).SetInt(new(big.Int).SetUint64(uint64(v))), true
+	case uint16:
+		return new(big.Rat).SetInt(new(big.Int).SetUint64(uint64(v))), true
+	case uint32:
+		return new(big.Rat).SetInt(new(big.Int).SetUint64(uint64(v))), true
+	case uint64:
+		return new(big.Rat).SetInt(new(big.Int).SetUint64(v)), true
+	case uintptr:
+		return new(big.Rat).SetInt(new(big.Int).SetUint64(uint64(v))), true
+	case float32:
+		return exactNumber(float64(v))
+	case float64:
+		if math.IsNaN(v) || math.IsInf(v, 0) {
+			return nil, false
+		}
+		return new(big.Rat).SetFloat64(v), true
+	case string:
+		s := strings.TrimSpace(v)
+		if s == "" {
+			return nil, false
+		}
+		r, ok := new(big.Rat).SetString(s)
+		return r, ok
+	default:
+		return nil, false
+	}
 }
