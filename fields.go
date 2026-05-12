@@ -14,7 +14,7 @@ func fieldByPath(target any, path string) (reflect.Value, error) {
 	if !v.IsValid() {
 		return reflect.Value{}, fmt.Errorf("target is nil")
 	}
-	for _, part := range strings.Split(path, ".") {
+	for part := range strings.SplitSeq(path, ".") {
 		if part == "" {
 			return reflect.Value{}, fmt.Errorf("field path %q contains an empty segment", path)
 		}
@@ -76,7 +76,7 @@ func EqField(target any, fieldPath string, otherPath string) error {
 	if equalAny(left, right) {
 		return nil
 	}
-	return fail("eqfield", left, right, "field must equal other field")
+	return failf("eqfield", left, right, "must equal %v", right)
 }
 
 func EqCSField(target any, fieldPath string, otherPath string) error {
@@ -91,7 +91,7 @@ func NeField(target any, fieldPath string, otherPath string) error {
 	if !equalAny(left, right) {
 		return nil
 	}
-	return fail("nefield", left, right, "field must not equal other field")
+	return failf("nefield", left, right, "must not equal %v", right)
 }
 
 func NeCSField(target any, fieldPath string, otherPath string) error {
@@ -99,7 +99,7 @@ func NeCSField(target any, fieldPath string, otherPath string) error {
 }
 
 func GtField(target any, fieldPath string, otherPath string) error {
-	return orderedField("gtfield", target, fieldPath, otherPath, func(cmp int) bool { return cmp > 0 }, "field must be greater than other field")
+	return orderedField("gtfield", target, fieldPath, otherPath, func(cmp int) bool { return cmp > 0 }, "must be greater than %v")
 }
 
 func GtCSField(target any, fieldPath string, otherPath string) error {
@@ -107,7 +107,7 @@ func GtCSField(target any, fieldPath string, otherPath string) error {
 }
 
 func GteField(target any, fieldPath string, otherPath string) error {
-	return orderedField("gtefield", target, fieldPath, otherPath, func(cmp int) bool { return cmp >= 0 }, "field must be greater than or equal to other field")
+	return orderedField("gtefield", target, fieldPath, otherPath, func(cmp int) bool { return cmp >= 0 }, "must be greater than or equal to %v")
 }
 
 func GteCSField(target any, fieldPath string, otherPath string) error {
@@ -115,7 +115,7 @@ func GteCSField(target any, fieldPath string, otherPath string) error {
 }
 
 func LtField(target any, fieldPath string, otherPath string) error {
-	return orderedField("ltfield", target, fieldPath, otherPath, func(cmp int) bool { return cmp < 0 }, "field must be less than other field")
+	return orderedField("ltfield", target, fieldPath, otherPath, func(cmp int) bool { return cmp < 0 }, "must be less than %v")
 }
 
 func LtCSField(target any, fieldPath string, otherPath string) error {
@@ -123,7 +123,7 @@ func LtCSField(target any, fieldPath string, otherPath string) error {
 }
 
 func LteField(target any, fieldPath string, otherPath string) error {
-	return orderedField("ltefield", target, fieldPath, otherPath, func(cmp int) bool { return cmp <= 0 }, "field must be less than or equal to other field")
+	return orderedField("ltefield", target, fieldPath, otherPath, func(cmp int) bool { return cmp <= 0 }, "must be less than or equal to %v")
 }
 
 func LteCSField(target any, fieldPath string, otherPath string) error {
@@ -142,7 +142,7 @@ func FieldContains(target any, fieldPath string, chars string) error {
 	if strings.Contains(s, chars) {
 		return nil
 	}
-	return fail("fieldcontains", s, chars, "field must contain requested characters")
+	return failf("fieldcontains", s, chars, "must contain %q", chars)
 }
 
 func FieldExcludes(target any, fieldPath string, chars string) error {
@@ -157,7 +157,7 @@ func FieldExcludes(target any, fieldPath string, chars string) error {
 	if !strings.Contains(s, chars) {
 		return nil
 	}
-	return fail("fieldexcludes", s, chars, "field must not contain requested characters")
+	return failf("fieldexcludes", s, chars, "must not contain %q", chars)
 }
 
 func fieldPair(target any, fieldPath string, otherPath string) (any, any, error) {
@@ -172,7 +172,7 @@ func fieldPair(target any, fieldPath string, otherPath string) (any, any, error)
 	return left, right, nil
 }
 
-func orderedField(tag string, target any, fieldPath string, otherPath string, pass func(int) bool, message string) error {
+func orderedField(tag string, target any, fieldPath string, otherPath string, pass func(int) bool, messageFormat string) error {
 	left, right, err := fieldPair(target, fieldPath, otherPath)
 	if err != nil {
 		return fail(tag, target, fieldPath+"~"+otherPath, err.Error())
@@ -181,5 +181,5 @@ func orderedField(tag string, target any, fieldPath string, otherPath string, pa
 	if ok && pass(cmp) {
 		return nil
 	}
-	return fail(tag, left, right, message)
+	return failf(tag, left, right, messageFormat, right)
 }

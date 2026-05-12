@@ -7,7 +7,7 @@ func Eq(value any, expected any) error {
 	if equalAny(value, expected) {
 		return nil
 	}
-	return fail("eq", value, expected, "value must equal expected value")
+	return failf("eq", value, expected, "must equal %v", expected)
 }
 
 // EqIgnoreCase validates that value equals expected case-insensitively.
@@ -15,7 +15,7 @@ func EqIgnoreCase(value string, expected string) error {
 	if strings.EqualFold(value, expected) {
 		return nil
 	}
-	return fail("eq_ignore_case", value, expected, "value must equal expected value ignoring case")
+	return failf("eq_ignore_case", value, expected, "must equal %v ignoring case", expected)
 }
 
 // Ne validates that value does not equal disallowed.
@@ -23,7 +23,7 @@ func Ne(value any, disallowed any) error {
 	if !equalAny(value, disallowed) {
 		return nil
 	}
-	return fail("ne", value, disallowed, "value must not equal disallowed value")
+	return failf("ne", value, disallowed, "must not equal %v", disallowed)
 }
 
 // NE is an alias for Ne.
@@ -34,7 +34,7 @@ func NeIgnoreCase(value string, disallowed string) error {
 	if !strings.EqualFold(value, disallowed) {
 		return nil
 	}
-	return fail("ne_ignore_case", value, disallowed, "value must not equal disallowed value ignoring case")
+	return failf("ne_ignore_case", value, disallowed, "must not equal %v ignoring case", disallowed)
 }
 
 // Gt validates that value is greater than threshold.
@@ -42,7 +42,7 @@ func Gt(value any, threshold any) error {
 	if cmp, ok := compareOrder(value, threshold); ok && cmp > 0 {
 		return nil
 	}
-	return fail("gt", value, threshold, "value must be greater than threshold")
+	return failf("gt", value, threshold, "must be greater than %v", threshold)
 }
 
 // GT is an alias for Gt.
@@ -53,7 +53,7 @@ func Gte(value any, threshold any) error {
 	if cmp, ok := compareOrder(value, threshold); ok && cmp >= 0 {
 		return nil
 	}
-	return fail("gte", value, threshold, "value must be greater than or equal to threshold")
+	return failf("gte", value, threshold, "must be %v or greater", threshold)
 }
 
 // GTE is an alias for Gte.
@@ -64,7 +64,7 @@ func Lt(value any, threshold any) error {
 	if cmp, ok := compareOrder(value, threshold); ok && cmp < 0 {
 		return nil
 	}
-	return fail("lt", value, threshold, "value must be less than threshold")
+	return failf("lt", value, threshold, "must be less than %v", threshold)
 }
 
 // LT is an alias for Lt.
@@ -75,7 +75,7 @@ func Lte(value any, threshold any) error {
 	if cmp, ok := compareOrder(value, threshold); ok && cmp <= 0 {
 		return nil
 	}
-	return fail("lte", value, threshold, "value must be less than or equal to threshold")
+	return failf("lte", value, threshold, "must be %v or less", threshold)
 }
 
 // LTE is an alias for Lte.

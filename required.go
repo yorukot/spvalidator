@@ -15,7 +15,7 @@ func Required(value any) error {
 	if !isZero(value) {
 		return nil
 	}
-	return fail("required", value, nil, "value is required")
+	return fail("required", value, nil, "required")
 }
 
 func RequiredIf(target any, fieldPath string, conditions ...FieldCondition) error {
@@ -110,7 +110,7 @@ func requireField(tag string, target any, fieldPath string) error {
 	if !isZero(value) {
 		return nil
 	}
-	return fail(tag, value, fieldPath, "field is required")
+	return failf(tag, value, fieldPath, "%s is required", fieldPath)
 }
 
 func excludeField(tag string, target any, fieldPath string) error {
@@ -121,7 +121,7 @@ func excludeField(tag string, target any, fieldPath string) error {
 	if isZero(value) {
 		return nil
 	}
-	return fail(tag, value, fieldPath, "field must be excluded")
+	return failf(tag, value, fieldPath, "%s must be excluded", fieldPath)
 }
 
 func conditionsMatch(target any, conditions []FieldCondition, emptyMatches bool) bool {

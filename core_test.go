@@ -107,3 +107,29 @@ func TestOrderedValidators(t *testing.T) {
 		t.Fatal("expected incomparable types to fail")
 	}
 }
+
+func TestFailureMessagesIncludeParameters(t *testing.T) {
+	cases := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{name: "gt", err: Gt(1, 2), want: "must be greater than 2"},
+		{name: "gte", err: Gte(1, 2), want: "must be 2 or greater"},
+		{name: "lt", err: Lt(3, 2), want: "must be less than 2"},
+		{name: "lte", err: Lte(3, 2), want: "must be 2 or less"},
+		{name: "len", err: Len("abc", 2), want: "must be 2 in length"},
+		{name: "min", err: Min(1, 2), want: "must be 2 or greater"},
+		{name: "max", err: Max(3, 2), want: "must be 2 or less"},
+		{name: "contains", err: Contains("abc", "z"), want: `must contain "z"`},
+		{name: "oneof", err: OneOf("c", "a", "b"), want: "must be one of [a b]"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := errorString(tc.err); got != tc.want {
+				t.Fatalf("expected %q, got %q", tc.want, got)
+			}
+		})
+	}
+}

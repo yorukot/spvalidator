@@ -17,7 +17,7 @@ func CIDR(value string) error {
 	if _, _, err := net.ParseCIDR(value); err == nil {
 		return nil
 	}
-	return fail("cidr", value, nil, "value must be a CIDR block")
+	return fail("cidr", value, nil, "must be a CIDR block")
 }
 
 func CIDRv4(value string) error {
@@ -28,7 +28,7 @@ func CIDRv4(value string) error {
 			return nil
 		}
 	}
-	return fail("cidrv4", value, nil, "value must be an IPv4 CIDR block")
+	return fail("cidrv4", value, nil, "must be an IPv4 CIDR block")
 }
 
 func CIDRv6(value string) error {
@@ -39,12 +39,12 @@ func CIDRv6(value string) error {
 			return nil
 		}
 	}
-	return fail("cidrv6", value, nil, "value must be an IPv6 CIDR block")
+	return fail("cidrv6", value, nil, "must be an IPv6 CIDR block")
 }
 
 func DataURI(value string) error {
 	if !strings.HasPrefix(strings.ToLower(value), "data:") {
-		return fail("datauri", value, nil, "value must be a data URI")
+		return fail("datauri", value, nil, "must be a data URI")
 	}
 	comma := strings.IndexByte(value, ',')
 	if comma < 0 {
@@ -66,7 +66,7 @@ func DataURI(value string) error {
 func FQDN(value string) error {
 	host := strings.TrimSuffix(value, ".")
 	if strings.Count(host, ".") < 1 || !validHostname(host, true) {
-		return fail("fqdn", value, nil, "value must be a fully qualified domain name")
+		return fail("fqdn", value, nil, "must be a fully qualified domain name")
 	}
 	return nil
 }
@@ -75,14 +75,14 @@ func Hostname(value string) error {
 	if validHostname(value, false) && startsWithLetter(value) {
 		return nil
 	}
-	return fail("hostname", value, nil, "value must be an RFC 952 hostname")
+	return fail("hostname", value, nil, "must be an RFC 952 hostname")
 }
 
 func HostnameRFC1123(value string) error {
 	if validHostname(value, false) {
 		return nil
 	}
-	return fail("hostname_rfc1123", value, nil, "value must be an RFC 1123 hostname")
+	return fail("hostname_rfc1123", value, nil, "must be an RFC 1123 hostname")
 }
 
 func HostnamePort(value string) error {
@@ -90,7 +90,7 @@ func HostnamePort(value string) error {
 	if err == nil && validHostForAddress(host) && Port(port) == nil {
 		return nil
 	}
-	return fail("hostname_port", value, nil, "value must be host:port")
+	return fail("hostname_port", value, nil, "must be host:port")
 }
 
 func Port(value any) error {
@@ -125,7 +125,7 @@ func IP(value string) error {
 	if net.ParseIP(value) != nil {
 		return nil
 	}
-	return fail("ip", value, nil, "value must be an IP address")
+	return fail("ip", value, nil, "must be an IP address")
 }
 
 func IPAddr(value string) error { return IP(value) }
@@ -139,7 +139,7 @@ func IPv4(value string) error {
 	if ip != nil && ip.To4() != nil {
 		return nil
 	}
-	return fail("ipv4", value, nil, "value must be an IPv4 address")
+	return fail("ipv4", value, nil, "must be an IPv4 address")
 }
 
 func IPv6(value string) error {
@@ -147,14 +147,14 @@ func IPv6(value string) error {
 	if ip != nil && ip.To4() == nil && ip.To16() != nil {
 		return nil
 	}
-	return fail("ipv6", value, nil, "value must be an IPv6 address")
+	return fail("ipv6", value, nil, "must be an IPv6 address")
 }
 
 func MAC(value string) error {
 	if _, err := net.ParseMAC(value); err == nil {
 		return nil
 	}
-	return fail("mac", value, nil, "value must be a MAC address")
+	return fail("mac", value, nil, "must be a MAC address")
 }
 
 func TCPAddr(value string) error {
@@ -185,7 +185,7 @@ func UnixAddr(value string) error {
 	if strings.TrimSpace(value) != "" && !strings.ContainsRune(value, 0) {
 		return nil
 	}
-	return fail("unix_addr", value, nil, "value must be a Unix socket path")
+	return fail("unix_addr", value, nil, "must be a Unix socket path")
 }
 
 func UDSExists(value string) error {
@@ -204,7 +204,7 @@ func URI(value string) error {
 	if err == nil && parsed.Scheme != "" {
 		return nil
 	}
-	return fail("uri", value, nil, "value must be a URI")
+	return fail("uri", value, nil, "must be a URI")
 }
 
 func URL(value string) error {
@@ -215,7 +215,7 @@ func URL(value string) error {
 	if err == nil && parsed.Scheme != "" && parsed.Host != "" {
 		return nil
 	}
-	return fail("url", value, nil, "value must be an absolute URL")
+	return fail("url", value, nil, "must be an absolute URL")
 }
 
 func HTTPURL(value string) error {
@@ -223,7 +223,7 @@ func HTTPURL(value string) error {
 	if err == nil && (parsed.Scheme == "http" || parsed.Scheme == "https") && parsed.Host != "" {
 		return nil
 	}
-	return fail("http_url", value, nil, "value must be an HTTP or HTTPS URL")
+	return fail("http_url", value, nil, "must be an HTTP or HTTPS URL")
 }
 
 func HTTPSURL(value string) error {
@@ -231,7 +231,7 @@ func HTTPSURL(value string) error {
 	if err == nil && parsed.Scheme == "https" && parsed.Host != "" {
 		return nil
 	}
-	return fail("https_url", value, nil, "value must be an HTTPS URL")
+	return fail("https_url", value, nil, "must be an HTTPS URL")
 }
 
 func Origin(value string) error {
@@ -245,48 +245,48 @@ func Origin(value string) error {
 		parsed.User == nil {
 		return nil
 	}
-	return fail("origin", value, nil, "value must be a web origin")
+	return fail("origin", value, nil, "must be a web origin")
 }
 
 func URLEncoded(value string) error {
 	if value == "" {
-		return fail("url_encoded", value, nil, "value must be URL encoded")
+		return fail("url_encoded", value, nil, "must be URL encoded")
 	}
 	decoded, err := url.QueryUnescape(value)
 	if err == nil && decoded != value {
 		return nil
 	}
-	return fail("url_encoded", value, nil, "value must be URL encoded")
+	return fail("url_encoded", value, nil, "must be URL encoded")
 }
 
 func URNRFC2141(value string) error {
 	if urnRFC2141Pattern.MatchString(value) {
 		return nil
 	}
-	return fail("urn_rfc2141", value, nil, "value must be an RFC 2141 URN")
+	return fail("urn_rfc2141", value, nil, "must be an RFC 2141 URN")
 }
 
 func networkAddr(tag string, value string, requireV4 bool, requireV6 bool) error {
 	host, port, err := net.SplitHostPort(value)
 	if err != nil || Port(port) != nil {
-		return fail(tag, value, nil, "value must be host:port")
+		return fail(tag, value, nil, "must be host:port")
 	}
 	if requireV4 {
 		if IPv4(host) == nil {
 			return nil
 		}
-		return fail(tag, value, nil, "value must contain an IPv4 host")
+		return fail(tag, value, nil, "must contain an IPv4 host")
 	}
 	if requireV6 {
 		if IPv6(host) == nil {
 			return nil
 		}
-		return fail(tag, value, nil, "value must contain an IPv6 host")
+		return fail(tag, value, nil, "must contain an IPv6 host")
 	}
 	if validHostForAddress(host) {
 		return nil
 	}
-	return fail(tag, value, nil, "value must contain a valid host")
+	return fail(tag, value, nil, "must contain a valid host")
 }
 
 func validHostForAddress(host string) bool {
@@ -302,11 +302,11 @@ func validHostname(value string, allowFQDN bool) bool {
 	if strings.Contains(value, "..") {
 		return false
 	}
-	labels := strings.Split(value, ".")
-	if len(labels) > 1 && !allowFQDN {
+	labelCount := strings.Count(value, ".") + 1
+	if labelCount > 1 && !allowFQDN {
 		return false
 	}
-	for _, label := range labels {
+	for label := range strings.SplitSeq(value, ".") {
 		if label == "" || len(label) > 63 || label[0] == '-' || label[len(label)-1] == '-' {
 			return false
 		}

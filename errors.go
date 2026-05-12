@@ -40,3 +40,7 @@ func fail(tag string, value any, param any, message string) error {
 		Message: message,
 	}
 }
+
+func failf(tag string, value any, param any, format string, args ...any) error {
+	return fail(tag, value, param, fmt.Sprintf(format, args...))
+}

@@ -43,7 +43,7 @@ func Base64(value string) error {
 			return nil
 		}
 	}
-	return fail("base64", value, nil, "value must be standard base64")
+	return fail("base64", value, nil, "must be standard base64")
 }
 
 func Base64URL(value string) error {
@@ -52,7 +52,7 @@ func Base64URL(value string) error {
 			return nil
 		}
 	}
-	return fail("base64url", value, nil, "value must be padded base64 URL encoding")
+	return fail("base64url", value, nil, "must be padded base64 URL encoding")
 }
 
 func Base64RawURL(value string) error {
@@ -61,7 +61,7 @@ func Base64RawURL(value string) error {
 			return nil
 		}
 	}
-	return fail("base64rawurl", value, nil, "value must be raw base64 URL encoding")
+	return fail("base64rawurl", value, nil, "must be raw base64 URL encoding")
 }
 
 func BICISO93622014(value string) error { return bic("bic_iso_9362_2014", value) }
@@ -72,41 +72,41 @@ func bic(tag string, value string) error {
 	if bicPattern.MatchString(value) {
 		return nil
 	}
-	return fail(tag, value, nil, "value must be a BIC")
+	return fail(tag, value, nil, "must be a BIC")
 }
 
 func BCP47LanguageTag(value string) error {
 	if bcp47Pattern.MatchString(value) {
 		return nil
 	}
-	return fail("bcp47_language_tag", value, nil, "value must be a BCP 47 language tag")
+	return fail("bcp47_language_tag", value, nil, "must be a BCP 47 language tag")
 }
 
 func BCP47StrictLanguageTag(value string) error {
 	if bcp47Pattern.MatchString(value) && !strings.Contains(value, "_") {
 		return nil
 	}
-	return fail("bcp47_strict_language_tag", value, nil, "value must be a strict BCP 47 language tag")
+	return fail("bcp47_strict_language_tag", value, nil, "must be a strict BCP 47 language tag")
 }
 
 func BTCAddr(value string) error {
 	if BTCAddrBech32(value) == nil || btcLegacyPattern.MatchString(value) {
 		return nil
 	}
-	return fail("btc_addr", value, nil, "value must be a Bitcoin address")
+	return fail("btc_addr", value, nil, "must be a Bitcoin address")
 }
 
 func BTCAddrBech32(value string) error {
 	if btcBech32Pattern.MatchString(strings.ToLower(value)) {
 		return nil
 	}
-	return fail("btc_addr_bech32", value, nil, "value must be a Bitcoin Bech32 address")
+	return fail("btc_addr_bech32", value, nil, "must be a Bitcoin Bech32 address")
 }
 
 func CreditCard(value string) error {
 	digits := digitsOnly(value)
 	if len(digits) < 12 || len(digits) > 19 || LuhnChecksum(digits) != nil {
-		return fail("credit_card", value, nil, "value must be a valid credit card number")
+		return fail("credit_card", value, nil, "must be a valid credit card number")
 	}
 	return nil
 }
@@ -115,7 +115,7 @@ func MongoDB(value string) error {
 	if mongoIDPattern.MatchString(value) {
 		return nil
 	}
-	return fail("mongodb", value, nil, "value must be a MongoDB ObjectID")
+	return fail("mongodb", value, nil, "must be a MongoDB ObjectID")
 }
 
 func MongoDBConnectionString(value string) error {
@@ -123,7 +123,7 @@ func MongoDBConnectionString(value string) error {
 	if err == nil && (parsed.Scheme == "mongodb" || parsed.Scheme == "mongodb+srv") && parsed.Host != "" {
 		return nil
 	}
-	return fail("mongodb_connection_string", value, nil, "value must be a MongoDB connection string")
+	return fail("mongodb_connection_string", value, nil, "must be a MongoDB connection string")
 }
 
 func Cron(value string) error {
@@ -141,11 +141,11 @@ func Cron(value string) error {
 
 func SpiceDB(value string) error {
 	if value == "" {
-		return fail("spicedb", value, nil, "value must be a SpiceDB identifier")
+		return fail("spicedb", value, nil, "must be a SpiceDB identifier")
 	}
 	for _, r := range value {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && !strings.ContainsRune("_-:/#.", r) {
-			return fail("spicedb", value, nil, "value must be a SpiceDB identifier")
+			return fail("spicedb", value, nil, "must be a SpiceDB identifier")
 		}
 	}
 	return nil
@@ -160,21 +160,21 @@ func DateTime(value string, layouts ...string) error {
 			return nil
 		}
 	}
-	return fail("datetime", value, layouts, "value must be a datetime")
+	return failf("datetime", value, layouts, "must match one of %v", layouts)
 }
 
 func E164(value string) error {
 	if e164Pattern.MatchString(value) {
 		return nil
 	}
-	return fail("e164", value, nil, "value must be an E.164 phone number")
+	return fail("e164", value, nil, "must be an E.164 phone number")
 }
 
 func EIN(value string) error {
 	if einPattern.MatchString(value) {
 		return nil
 	}
-	return fail("ein", value, nil, "value must be a US EIN")
+	return fail("ein", value, nil, "must be a US EIN")
 }
 
 func Email(value string) error {
@@ -182,76 +182,76 @@ func Email(value string) error {
 	if err == nil && address.Address == value && strings.Contains(address.Address, "@") {
 		return nil
 	}
-	return fail("email", value, nil, "value must be an email address")
+	return fail("email", value, nil, "must be an email address")
 }
 
 func ETHAddr(value string) error {
 	if ethPattern.MatchString(value) {
 		return nil
 	}
-	return fail("eth_addr", value, nil, "value must be an Ethereum address")
+	return fail("eth_addr", value, nil, "must be an Ethereum address")
 }
 
 func Hexadecimal(value string) error {
 	if value != "" && hexPattern.MatchString(value) {
 		return nil
 	}
-	return fail("hexadecimal", value, nil, "value must be hexadecimal")
+	return fail("hexadecimal", value, nil, "must be hexadecimal")
 }
 
 func HexColor(value string) error {
 	if hexColorPattern.MatchString(value) {
 		return nil
 	}
-	return fail("hexcolor", value, nil, "value must be a hex color")
+	return fail("hexcolor", value, nil, "must be a hex color")
 }
 
 func HSL(value string) error {
 	if hslPattern.MatchString(value) {
 		return nil
 	}
-	return fail("hsl", value, nil, "value must be an HSL color")
+	return fail("hsl", value, nil, "must be an HSL color")
 }
 
 func HSLA(value string) error {
 	if hslaPattern.MatchString(value) {
 		return nil
 	}
-	return fail("hsla", value, nil, "value must be an HSLA color")
+	return fail("hsla", value, nil, "must be an HSLA color")
 }
 
 func CMYK(value string) error {
 	if cmykPattern.MatchString(value) {
 		return nil
 	}
-	return fail("cmyk", value, nil, "value must be a CMYK color")
+	return fail("cmyk", value, nil, "must be a CMYK color")
 }
 
 func HTML(value string) error {
 	if htmlTagPattern.MatchString(value) {
 		return nil
 	}
-	return fail("html", value, nil, "value must contain HTML tags")
+	return fail("html", value, nil, "must contain HTML tags")
 }
 
 func HTMLEncoded(value string) error {
 	if html.UnescapeString(value) != value {
 		return nil
 	}
-	return fail("html_encoded", value, nil, "value must contain HTML entities")
+	return fail("html_encoded", value, nil, "must contain HTML entities")
 }
 
 func ISBN(value string) error {
 	if ISBN10(value) == nil || ISBN13(value) == nil {
 		return nil
 	}
-	return fail("isbn", value, nil, "value must be an ISBN")
+	return fail("isbn", value, nil, "must be an ISBN")
 }
 
 func ISBN10(value string) error {
 	code := strings.ToUpper(strings.NewReplacer("-", "", " ", "").Replace(value))
 	if len(code) != 10 {
-		return fail("isbn10", value, nil, "value must be an ISBN-10")
+		return fail("isbn10", value, nil, "must be an ISBN-10")
 	}
 	sum := 0
 	for i, r := range code {
@@ -261,20 +261,20 @@ func ISBN10(value string) error {
 		} else if r >= '0' && r <= '9' {
 			digit = int(r - '0')
 		} else {
-			return fail("isbn10", value, nil, "value must be an ISBN-10")
+			return fail("isbn10", value, nil, "must be an ISBN-10")
 		}
 		sum += digit * (10 - i)
 	}
 	if sum%11 == 0 {
 		return nil
 	}
-	return fail("isbn10", value, nil, "value must be an ISBN-10")
+	return fail("isbn10", value, nil, "must be an ISBN-10")
 }
 
 func ISBN13(value string) error {
 	code := strings.NewReplacer("-", "", " ", "").Replace(value)
 	if len(code) != 13 || !allDigits(code) {
-		return fail("isbn13", value, nil, "value must be an ISBN-13")
+		return fail("isbn13", value, nil, "must be an ISBN-13")
 	}
 	sum := 0
 	for i, r := range code[:12] {
@@ -289,13 +289,13 @@ func ISBN13(value string) error {
 	if check == int(code[12]-'0') {
 		return nil
 	}
-	return fail("isbn13", value, nil, "value must be an ISBN-13")
+	return fail("isbn13", value, nil, "must be an ISBN-13")
 }
 
 func ISSN(value string) error {
 	code := strings.ToUpper(strings.ReplaceAll(value, "-", ""))
 	if len(code) != 8 {
-		return fail("issn", value, nil, "value must be an ISSN")
+		return fail("issn", value, nil, "must be an ISSN")
 	}
 	sum := 0
 	for i, r := range code {
@@ -305,67 +305,67 @@ func ISSN(value string) error {
 		} else if r >= '0' && r <= '9' {
 			digit = int(r - '0')
 		} else {
-			return fail("issn", value, nil, "value must be an ISSN")
+			return fail("issn", value, nil, "must be an ISSN")
 		}
 		sum += digit * (8 - i)
 	}
 	if sum%11 == 0 {
 		return nil
 	}
-	return fail("issn", value, nil, "value must be an ISSN")
+	return fail("issn", value, nil, "must be an ISSN")
 }
 
 func ISO3166Alpha2(value string) error {
 	if regexp.MustCompile(`^[A-Z]{2}$`).MatchString(value) {
 		return nil
 	}
-	return fail("iso3166_1_alpha2", value, nil, "value must be an ISO 3166-1 alpha-2 code")
+	return fail("iso3166_1_alpha2", value, nil, "must be an ISO 3166-1 alpha-2 code")
 }
 
 func ISO3166Alpha3(value string) error {
 	if regexp.MustCompile(`^[A-Z]{3}$`).MatchString(value) {
 		return nil
 	}
-	return fail("iso3166_1_alpha3", value, nil, "value must be an ISO 3166-1 alpha-3 code")
+	return fail("iso3166_1_alpha3", value, nil, "must be an ISO 3166-1 alpha-3 code")
 }
 
 func ISO3166AlphaNumeric(value string) error {
 	if regexp.MustCompile(`^[0-9]{3}$`).MatchString(value) {
 		return nil
 	}
-	return fail("iso3166_1_alpha_numeric", value, nil, "value must be an ISO 3166-1 numeric code")
+	return fail("iso3166_1_alpha_numeric", value, nil, "must be an ISO 3166-1 numeric code")
 }
 
 func ISO31662(value string) error {
 	if regexp.MustCompile(`^[A-Z]{2}-[A-Z0-9]{1,6}$`).MatchString(value) {
 		return nil
 	}
-	return fail("iso3166_2", value, nil, "value must be an ISO 3166-2 subdivision code")
+	return fail("iso3166_2", value, nil, "must be an ISO 3166-2 subdivision code")
 }
 
 func ISO4217(value string) error {
 	if regexp.MustCompile(`^[A-Z]{3}$`).MatchString(value) {
 		return nil
 	}
-	return fail("iso4217", value, nil, "value must be an ISO 4217 currency code")
+	return fail("iso4217", value, nil, "must be an ISO 4217 currency code")
 }
 
 func JSON(value string) error {
 	if json.Valid([]byte(value)) {
 		return nil
 	}
-	return fail("json", value, nil, "value must be JSON")
+	return fail("json", value, nil, "must be JSON")
 }
 
 func JWT(value string) error {
 	parts := strings.Split(value, ".")
 	if len(parts) != 3 || parts[2] == "" {
-		return fail("jwt", value, nil, "value must be a JWT")
+		return fail("jwt", value, nil, "must be a JWT")
 	}
 	for _, part := range parts[:2] {
 		decoded, err := base64.RawURLEncoding.DecodeString(part)
 		if err != nil || !json.Valid(decoded) {
-			return fail("jwt", value, nil, "value must be a JWT")
+			return fail("jwt", value, nil, "must be a JWT")
 		}
 	}
 	return nil
@@ -375,20 +375,20 @@ func Latitude(value any) error {
 	if n, ok := numberValue(value); ok && n >= -90 && n <= 90 {
 		return nil
 	}
-	return fail("latitude", value, nil, "value must be a latitude")
+	return fail("latitude", value, "-90..90", "must be between -90 and 90")
 }
 
 func Longitude(value any) error {
 	if n, ok := numberValue(value); ok && n >= -180 && n <= 180 {
 		return nil
 	}
-	return fail("longitude", value, nil, "value must be a longitude")
+	return fail("longitude", value, "-180..180", "must be between -180 and 180")
 }
 
 func LuhnChecksum(value any) error {
 	digits := digitsOnlyValue(value)
 	if digits == "" || !luhnValid(digits) {
-		return fail("luhn_checksum", value, nil, "value must pass the Luhn checksum")
+		return fail("luhn_checksum", value, nil, "must pass the Luhn checksum")
 	}
 	return nil
 }
@@ -413,7 +413,7 @@ func PostcodeISO3166Alpha2(value string, country string) error {
 	if pattern.MatchString(strings.ToUpper(value)) {
 		return nil
 	}
-	return fail("postcode_iso3166_alpha2", value, country, "value must be a postcode for the country")
+	return failf("postcode_iso3166_alpha2", value, country, "must be a %s postcode", country)
 }
 
 func PostcodeISO3166Alpha2Field(target any, fieldPath string, countryFieldPath string) error {
@@ -436,31 +436,31 @@ func PostcodeISO3166Alpha2Field(target any, fieldPath string, countryFieldPath s
 	if PostcodeISO3166Alpha2(vs, cs) == nil {
 		return nil
 	}
-	return fail("postcode_iso3166_alpha2_field", vs, cs, "postcode field must match country field")
+	return failf("postcode_iso3166_alpha2_field", vs, cs, "must match %s postcode", cs)
 }
 
 func RGB(value string) error {
 	if rgbPattern.MatchString(value) {
 		return nil
 	}
-	return fail("rgb", value, nil, "value must be an RGB color")
+	return fail("rgb", value, nil, "must be an RGB color")
 }
 
 func RGBA(value string) error {
 	if rgbaPattern.MatchString(value) {
 		return nil
 	}
-	return fail("rgba", value, nil, "value must be an RGBA color")
+	return fail("rgba", value, nil, "must be an RGBA color")
 }
 
 func SSN(value string) error {
 	match := ssnPattern.FindStringSubmatch(value)
 	if match == nil {
-		return fail("ssn", value, nil, "value must be a US SSN")
+		return fail("ssn", value, nil, "must be a US SSN")
 	}
 	area, _ := strconv.Atoi(match[1])
 	if area == 0 || area == 666 || area >= 900 || match[2] == "00" || match[3] == "0000" {
-		return fail("ssn", value, nil, "value must be a US SSN")
+		return fail("ssn", value, nil, "must be a US SSN")
 	}
 	return nil
 }
@@ -469,14 +469,14 @@ func Timezone(value string) error {
 	if _, err := time.LoadLocation(value); err == nil {
 		return nil
 	}
-	return fail("timezone", value, nil, "value must be an IANA timezone")
+	return fail("timezone", value, nil, "must be an IANA timezone")
 }
 
 func UUID(value string) error {
 	if uuidPattern.MatchString(value) {
 		return nil
 	}
-	return fail("uuid", value, nil, "value must be a UUID")
+	return fail("uuid", value, nil, "must be a UUID")
 }
 
 func UUID3(value string) error { return uuidVersion("uuid3", value, '3', false) }
@@ -495,7 +495,7 @@ func UUIDRFC4122(value string) error {
 	if UUID(value) == nil && isRFC4122UUID(value) {
 		return nil
 	}
-	return fail("uuid_rfc4122", value, nil, "value must be an RFC 4122 UUID")
+	return fail("uuid_rfc4122", value, nil, "must be an RFC 4122 UUID")
 }
 
 func MD4(value string) error       { return hexLength("md4", value, 32) }
@@ -513,28 +513,28 @@ func SemVer(value string) error {
 	if semverPattern.MatchString(value) {
 		return nil
 	}
-	return fail("semver", value, nil, "value must be semantic version 2.0.0")
+	return fail("semver", value, nil, "must be semantic version 2.0.0")
 }
 
 func ULID(value string) error {
 	if ulidPattern.MatchString(strings.ToUpper(value)) {
 		return nil
 	}
-	return fail("ulid", value, nil, "value must be a ULID")
+	return fail("ulid", value, nil, "must be a ULID")
 }
 
 func CVE(value string) error {
 	if cvePattern.MatchString(value) {
 		return nil
 	}
-	return fail("cve", value, nil, "value must be a CVE identifier")
+	return fail("cve", value, nil, "must be a CVE identifier")
 }
 
 func uuidVersion(tag string, value string, version byte, rfc4122 bool) error {
 	if UUID(value) == nil && len(value) > 14 && value[14] == version && (!rfc4122 || isRFC4122UUID(value)) {
 		return nil
 	}
-	return fail(tag, value, nil, "value must be the requested UUID version")
+	return failf(tag, value, string(version), "must be UUID v%c", version)
 }
 
 func isRFC4122UUID(value string) bool {
@@ -553,7 +553,7 @@ func hexLength(tag string, value string, length int) error {
 	if len(value) == length && hexPattern.MatchString(value) {
 		return nil
 	}
-	return fail(tag, value, length, "value must be a hex hash of the required length")
+	return failf(tag, value, length, "must be %d hex chars", length)
 }
 
 func validCronField(field string, index int, total int) bool {
