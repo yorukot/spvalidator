@@ -22,6 +22,27 @@ if err := spvalidator.Required(""); spvalidator.IsValidationError(err) {
 }
 ```
 
+String values can also use a fluent validation chain.
+
+```go
+value, err := spvalidator.String("  123e4567-e89b-12d3-a456-426614174000  ").
+	TrimSpace().
+	Required().
+	Max(36).
+	UUID().
+	Value()
+```
+
+Non-string values can use `Any`.
+
+```go
+err := spvalidator.Any(21).
+	Required().
+	Gte(18).
+	Lte(120).
+	Err()
+```
+
 Field validators use exported struct field paths.
 
 ```go
