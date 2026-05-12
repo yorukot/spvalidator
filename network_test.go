@@ -25,6 +25,15 @@ func TestNetworkValidators(t *testing.T) {
 	})
 
 	t.Run("hostnames", func(t *testing.T) {
+		expectNoError(t, Domain("example.com"))
+		expectNoError(t, Domain("sub-domain.example.co.uk."))
+		expectNoError(t, Domain("xn--d1acufc.xn--p1ai"))
+		validateErr(t, Domain("example"), "domain")
+		validateErr(t, Domain("https://example.com"), "domain")
+		validateErr(t, Domain("example.com:443"), "domain")
+		validateErr(t, Domain("127.0.0.1"), "domain")
+		validateErr(t, Domain("example.123"), "domain")
+		validateErr(t, Domain("bad_host.example"), "domain")
 		expectNoError(t, FQDN("example.com"))
 		validateErr(t, FQDN("example"), "fqdn")
 		expectNoError(t, Hostname("example"))

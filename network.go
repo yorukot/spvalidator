@@ -63,6 +63,14 @@ func DataURI(value string) error {
 	return fail("datauri", value, nil, "data URI payload is invalid")
 }
 
+func Domain(value string) error {
+	host := strings.TrimSuffix(value, ".")
+	if strings.Count(host, ".") >= 1 && net.ParseIP(host) == nil && validHostname(host, true) && topLevelDomainHasLetter(host) {
+		return nil
+	}
+	return fail("domain", value, nil, "must be a domain name")
+}
+
 func FQDN(value string) error {
 	host := strings.TrimSuffix(value, ".")
 	if strings.Count(host, ".") < 1 || !validHostname(host, true) {
@@ -317,6 +325,20 @@ func validHostname(value string, allowFQDN bool) bool {
 		}
 	}
 	return true
+}
+
+func topLevelDomainHasLetter(value string) bool {
+	tld := value
+	if lastDot := strings.LastIndexByte(value, '.'); lastDot >= 0 {
+		tld = value[lastDot+1:]
+	}
+	for i := 0; i < len(tld); i++ {
+		c := tld[i]
+		if (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') {
+			return true
+		}
+	}
+	return false
 }
 
 func startsWithLetter(value string) bool {
